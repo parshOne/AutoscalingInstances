@@ -3,19 +3,26 @@ resource "aws_security_group" "ec2_public_security_group" {
     name        = "EC2-public-scg"
     description = "Internet reaching access for public ec2s"
     vpc_id      = "${aws_vpc.mainvpc.id}"
+// using dynamic block for ingress 
 
-    ingress {
-      from_port   = 22
+   dynamic "ingress" {
+   ports = [22,80]
+   for_each = "${var.ports}"
+   iterator = port
+    content {
+      from_port   = "${port.value}
       to_port     = 22
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     }
-    ingress {
+}
+  /*  ingress {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     }
+*/
     egress {
       from_port       = 0
       to_port         = 0
